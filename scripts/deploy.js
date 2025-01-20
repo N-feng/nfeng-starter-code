@@ -7,15 +7,15 @@
 const hre = require("hardhat");
 
 const tokens = (n) => {
-  return ethers.utils.parseUnits(n.toString(), 'ether')
+  return hre.ethers.utils.parseUnits(n.toString(), 'ether')
 }
 
 async function main() {
   // Setup accounts
-  const [buyer, seller, inspector, lender] = await ethers.getSigners()
+  const [buyer, seller, inspector, lender] = await hre.ethers.getSigners()
 
   // Deploy Real Estate
-  const RealEstate = await ethers.getContractFactory('RealEstate')
+  const RealEstate = await hre.ethers.getContractFactory('RealEstate')
   const realEstate = await RealEstate.deploy()
   await realEstate.deployed()
 
@@ -28,7 +28,7 @@ async function main() {
   }
 
   // Deploy Escrow
-  const Escrow = await ethers.getContractFactory('Escrow')
+  const Escrow = await hre.ethers.getContractFactory('Escrow')
   const escrow = await Escrow.deploy(
     realEstate.address,
     seller.address,
@@ -40,9 +40,10 @@ async function main() {
   console.log(`Deployed Escrow Contract at: ${escrow.address}`)
   console.log(`Listing 3 properties...\n`)
 
+  let transaction
   for (let i = 0; i < 3; i++) {
     // Approve properties...
-    let transaction = await realEstate.connect(seller).approve(escrow.address, i + 1)
+    transaction = await realEstate.connect(seller).approve(escrow.address, i + 1)
     await transaction.wait()
   }
 
